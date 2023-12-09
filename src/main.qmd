@@ -1,0 +1,146 @@
+# Discrete L(2,1) Graph Coloring Final {style="text-align: center;"}
+
+## Load any dependencies
+
+-   `numpy` provides a handy mathematical framework, allowing us to work easily with matrix operations
+-   `matplotlib` works with `networkx` to generate the network graphs
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import networkx as nx
+```
+
+## Define Helper Classes & Functions
+
+### Graphing Function
+```{python}
+# define a function to plot an adjacency matrix
+def createGraph(adjM, labels):
+
+    # create a list to store each of the edges
+    edges = []
+    noofvertices = len(adjM)
+    for mat in adjM:
+        # ensure that the matrix is an adjacency matrix
+        if len(mat) > noofvertices or len(mat) < noofvertices:
+            print("False Adjacency Matrix")
+            return 0
+    for i in range(len(adjM)):
+        mat = adjM[i]
+        for j in range(len(mat)):
+            if mat[j] == 1:
+                temp = [i, j]
+                # define the edges between each of the nodes
+                edges.append(temp)
+    # create a networkx graph instance
+    G = nx.Graph()
+    # add the defined edges
+    G.add_edges_from(edges)
+    # create the plot
+    nx.draw_networkx(G, labels=labels, nodelist=labels.keys())
+    # show the plot
+    plt.show()
+    return G
+```
+
+### Node & Edge Classes
+
+```{python}
+class Edge:
+  def __init__(self, v1, v2):
+    self.v1 = v1
+    self.v2 = v2
+
+class Graph:
+  def __init__(self, edges):
+    self.edges = edges
+    self.vertices = []
+    self.adjacency_matrix = []
+    self.matrix_2 = []
+    self.greedy_labels = []
+    self.chang_kuo_labels = []
+    self.make_vertex_list()
+    self.make_adjacency_matrix()
+
+  def make_vertex_list(self):
+    for edge in self.edges:
+      if edge.v1 not in self.vertices:
+        self.vertices.append(edge.v1)
+      if edge.v2 not in self.vertices:
+       self.vertices.append(edge.v2)
+
+  def make_adjacency_matrix(self):
+    self.adjacency_matrix = np.zeros((len(self.vertices), len(self.vertices)))
+    for edge in self.edges:
+      v1_index = self.vertices.index(edge.v1)
+      v2_index = self.vertices.index(edge.v2)
+      self.adjacency_matrix[v1_index][v2_index] += 1
+      self.adjacency_matrix[v2_index][v1_index] += 1
+    self.matrix_2 = np.matmul(self.adjacency_matrix, self.adjacency_matrix)
+
+  def label_greedy(self):
+    for i in range(len(self.vertices)):
+      label_number = 0
+      for j in range(i):
+        while (self.adjacency_matrix[i][j] > 0 and abs(label_number - self.greedy_labels[j]) < 2) or (self.matrix_2[i][j] > 0 and abs(label_number - self.greedy_labels[j]) < 1):
+          label_number += 1
+      self.greedy_labels.append(label_number)
+
+  def label_chang_kuo_mod(self):
+    self.chang_kuo_labels = [-2 for i in range(len(self.vertices))]
+    lamb = 0
+    while -2 in self.chang_kuo_labels:
+      for i in range(len(self.vertices)):
+        if self.chang_kuo_labels[i] == -2:
+          conflict = False
+          for j in range(len(self.vertices)):
+            if i != j and (self.adjacency_matrix[i][j] > 0 and abs(lamb - self.chang_kuo_labels[j]) < 2) or (self.matrix_2[i][j] > 0 and abs(lamb - self.chang_kuo_labels[j]) < 1):
+              conflict = True
+              break
+          if not conflict:
+            self.chang_kuo_labels[i] = lamb
+      lamb += 1
+```
+
+## Testing
+
+### Create Example Adjacency Matrix
+
+Test the node and edge class code by making a graph
+
+```{python}
+mygraph = Graph([Edge("a", "b"), Edge("b", "d"), Edge("d", "c"), Edge("c", "a")])
+mygraph.label_greedy()
+print(mygraph.greedy_labels)
+
+mygraph.label_chang_kuo_mod()
+print(mygraph.chang_kuo_labels)
+
+c7 = Graph([Edge("a", "b"), Edge("b", "c"), Edge("c", "d"), Edge("d", "e"), Edge("e", "f"), Edge("f", "g"), Edge("g", "a")])
+c7.label_greedy()
+print(c7.greedy_labels)
+c7.label_chang_kuo_mod()
+print(c7.chang_kuo_labels)
+
+```
+
+### Greedy Labeling
+
+```{python}
+# graph based on greedy labels
+x = createGraph(c7.adjacency_matrix, {k: v for (k, v) in zip(
+    range(len(c7.greedy_labels)), map(str, c7.greedy_labels))})
+
+```
+
+
+
+### Chang Kuo Labeling
+
+```{python}
+# graph based on Chang Kuo Labels
+createGraph(c7.adjacency_matrix, {k: v for (k, v) in zip(
+    range(len(c7.chang_kuo_labels)), map(str, c7.chang_kuo_labels))})
+
+```

@@ -1,14 +1,13 @@
-# Discrete L(2,1) Graph Coloring Final {style="text-align: center;"}
+# Discrete L(2,1) Graph Coloring Final 
+- [Installing Requirements](#installing-requirements)
 
-- [Installing Requirements]
+  - [requirements.txt install](#requirements.txt-install)
 
-  - [requirements.txt install]
-
-  - [conda install]
+  - [conda install](#conda-install)
 
 - [What is L(2,1)](#what-is-l21)
 
-## Installing Requirements {style="text-align: left;"}
+## Installing Requirements 
 
 We offer a `requirements.txt` for traditional pip install or a conda
 `environment.yml` file. Note that Quarto is required to run the `.qmd` file.

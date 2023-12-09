@@ -1,7 +1,7 @@
 # Discrete L(2,1) Graph Coloring Final 
 - [Installing Requirements](#installing-requirements)
 
-  - [requirements.txt install](#requirements.txt-install)
+  - [requirements.txt install](#requirements-txt-install)
 
   - [conda install](#conda-install)
 

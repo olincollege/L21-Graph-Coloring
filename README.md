@@ -33,7 +33,7 @@ conda env create -f environment.yml
 
 Note that this assumes that you have Anaconda or Miniconda setup on your system.
 
-## What is L(2,1) {#what-is-l21}
+## What is L(2,1)
 
 L(2,1) is a method of graph vertex labeling. For a graph, whenever x and y are
 two adjacent vertices then their label must have a distance greater than or

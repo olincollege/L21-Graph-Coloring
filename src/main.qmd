@@ -38,7 +38,8 @@ def createGraph(adjM, labels):
     # add the defined edges
     G.add_edges_from(edges)
     # create the plot
-    nx.draw_networkx(G, labels=labels, nodelist=labels.keys())
+    nx.draw_networkx(G, labels=labels, nodelist=labels.keys(), node_size=800,
+                     node_color="#42aaf5")
     # show the plot
     plt.show()
     return G
@@ -148,11 +149,18 @@ class Graph:
 Test the node and edge class code by making a graph
 
 ```{python}
-mygraph = Graph([Edge("a", "b"), Edge("b", "d"), Edge("d", "c"),
-                Edge("c", "a"), Edge("a", "z"), Edge("a", "x"), Edge("b", "y"), Edge("c", "y"), Edge("d", "y")])
+
+# example graph
+# [Edge("a", "b"), Edge("b", "d"), Edge("d", "c"), Edge("c", "a"), Edge("a", "z"), Edge("a", "x"), Edge("b", "y"), Edge("c", "y"), Edge("d", "y")]
+
+# initialize a graph instance
+mygraph = Graph([Edge("a", "b"), Edge("b", "c"), Edge("c", "d"), Edge(
+    "d", "e"), Edge("e", "f"), Edge("f", "g"), Edge("g", "a")])
+# run the greedy algorithm
 mygraph.label_greedy()
 print(mygraph.greedy_labels)
 
+# run the Chang Kuo algorithm
 mygraph.label_chang_kuo_mod()
 print(mygraph.chang_kuo_labels)
 

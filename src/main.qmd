@@ -48,100 +48,97 @@ def createGraph(adjM, labels):
 
 ```{python}
 class Edge:
-"""
-Class representing an edge in a graph.
-Attributes:
-    v1: Name of first vertex the edge is connected to
-    v2: Name of the other vertex the edge connects
-"""
+    """
+    Class representing an edge in a graph.
+    Attributes:
+        v1: Name of first vertex the edge is connected to
+        v2: Name of the other vertex the edge connects
+    """
 
-  def __init__(self, v1, v2):
-    """
-    Initialization method
-    """
-    self.v1 = v1
-    self.v2 = v2
+    def __init__(self, v1, v2):
+        """
+        Initialization method
+        """
+        self.v1 = v1
+        self.v2 = v2
+
 
 class Graph:
-"""
-Class represnting a graph made of edges.
-Attributes:
-    edges: A list of Edge objects
-"""
+    """
+    Class represnting a graph made of edges.
 
-  def __init__(self, edges):
-    """
-    Initialize a Graph object
-    """
-    self.edges = edges
-    self.vertices = []
-    self.adjacency_matrix = []
-    self.matrix_2 = []
-    self.greedy_labels = []
-    self.chang_kuo_labels = []
-    self.make_vertex_list()
-    self.make_adjacency_matrix()
 
-  def make_vertex_list(self):
+    Attributes:
+        edges: A list of Edge objects
     """
-    Given a list of edges, create a list of vertices
-    """
-    for edge in self.edges:
-      if edge.v1 not in self.vertices:
-        self.vertices.append(edge.v1)
-      if edge.v2 not in self.vertices:
-       self.vertices.append(edge.v2)
 
-  def make_adjacency_matrix(self):
-    """
-    Given a list of edges and vertices, create an adjacency matrix for the graph
-    """
-    self.adjacency_matrix = np.zeros((len(self.vertices), len(self.vertices)))
-    for edge in self.edges:
-      v1_index = self.vertices.index(edge.v1)
-      v2_index = self.vertices.index(edge.v2)
-      self.adjacency_matrix[v1_index][v2_index] += 1
-      self.adjacency_matrix[v2_index][v1_index] += 1
-    # create an adjacency matrix of degree 2
-    self.matrix_2 = np.matmul(self.adjacency_matrix, self.adjacency_matrix)
+    def __init__(self, edges):
+        """
+        Initialize a Graph object
+        """
+        self.edges = edges
+        self.vertices = []
+        self.adjacency_matrix = []
+        self.matrix_2 = []
+        self.greedy_labels = []
+        self.chang_kuo_labels = []
+        self.make_vertex_list()
+        self.make_adjacency_matrix()
 
-  def label_greedy(self):
-    """
-    Compute the L(2,1) label for each vertex in the graph using a greedy algorithm
-    """
-    # iterate through the vertices
-    for i in range(len(self.vertices)):
-      # initialize the labeling number to 0
-      label_number = 0
-      for j in range(i):
-        while (self.adjacency_matrix[i][j] > 0 and abs(label_number - self.greedy_labels[j]) < 2) or (self.matrix_2[i][j] > 0 and abs(label_number - self.greedy_labels[j]) < 1):
-          # increment the labeling number if the current one violates the L(2,1) labeling rules
-          label_number += 1
-      self.greedy_labels.append(label_number)
+    def make_vertex_list(self):
+        """
+        Given a list of edges, create a list of vertices
+        """
+        for edge in self.edges:
+            if edge.v1 not in self.vertices:
+                self.vertices.append(edge.v1)
+            if edge.v2 not in self.vertices:
+                self.vertices.append(edge.v2)
 
-  def label_chang_kuo_mod(self):
-  """
-  Compute the L(2,1) label for each vertex in the graph using the modified Chang-Kuo algorithm
-  """
-  # initialize all the labels to -2 to avoid interfering with the actual labels
-    self.chang_kuo_labels = [-2 for i in range(len(self.vertices))]
-    # initialize the lambda number to zero
-    lamb = 0
-    # while any vertices are unlabeled
-    while -2 in self.chang_kuo_labels:
-      for i in range(len(self.vertices)):
-        # if the current vertex is unlabeled, attempt to label it with the current lambda
-        if self.chang_kuo_labels[i] == -2:
-          conflict = False
-          for j in range(len(self.vertices)):
-            if i != j and (self.adjacency_matrix[i][j] > 0 and abs(lamb - self.chang_kuo_labels[j]) < 2) or (self.matrix_2[i][j] > 0 and abs(lamb - self.chang_kuo_labels[j]) < 1):
-              # see if labeling with the current number results in a conflict with the L(2,1) labeling rules
-              conflict = True
-              break
-          if not conflict:
-            # label the current vertex with the current lambda if there is no conflict
-            self.chang_kuo_labels[i] = lamb
-      lamb += 1
+    def make_adjacency_matrix(self):
+        """
+        Given a list of edges and vertices, create an adjacency matrix for the graph
+        """
+        self.adjacency_matrix = np.zeros(
+            (len(self.vertices), len(self.vertices)))
+        for edge in self.edges:
+            v1_index = self.vertices.index(edge.v1)
+            v2_index = self.vertices.index(edge.v2)
+            self.adjacency_matrix[v1_index][v2_index] += 1
+            self.adjacency_matrix[v2_index][v1_index] += 1
+        self.matrix_2 = np.matmul(self.adjacency_matrix, self.adjacency_matrix)
+
+    def label_greedy(self):
+        # iterate through the vertices
+        for i in range(len(self.vertices)):
+            label_number = 0
+            # initialize the lamda number to 0
+            for j in range(i):
+                while (self.adjacency_matrix[i][j] > 0 and abs(label_number - self.greedy_labels[j]) < 2) or (self.matrix_2[i][j] > 0 and abs(label_number - self.greedy_labels[j]) < 1):
+                    # increment the lamda number if the current one violates the L(2,1) labeling rules
+                    label_number += 1
+            self.greedy_labels.append(label_number)
+
+    def label_chang_kuo_mod(self):
+        # initialize all the labels to -2 to avoid interfering with the actual labels
+        self.chang_kuo_labels = [-2 for i in range(len(self.vertices))]
+        # initialize the lambda number to zero
+        lamb = 0
+        # while any vertices are unlabeled
+        while -2 in self.chang_kuo_labels:
+            for i in range(len(self.vertices)):
+                # if the current vertex is unlabeled, attempt to label it with the current lambda
+                if self.chang_kuo_labels[i] == -2:
+                    conflict = False
+                    for j in range(len(self.vertices)):
+                        # see if labeling with the current number results in a conflict with the L(2,1) labeling rules
+                        if i != j and (self.adjacency_matrix[i][j] > 0 and abs(lamb - self.chang_kuo_labels[j]) < 2) or (self.matrix_2[i][j] > 0 and abs(lamb - self.chang_kuo_labels[j]) < 1):
+                            conflict = True
+                            break
+                    if not conflict:
+                        # label the current vertex with the current lambda if there is no conflict
+                        self.chang_kuo_labels[i] = lamb
+            lamb += 1
 ```
 
 ## Testing
@@ -151,18 +148,15 @@ Attributes:
 Test the node and edge class code by making a graph
 
 ```{python}
-mygraph = Graph([Edge("a", "b"), Edge("b", "d"), Edge("d", "c"), Edge("c", "a")])
+mygraph = Graph([Edge("a", "b"), Edge("b", "d"), Edge("d", "c"),
+                Edge("c", "a"), Edge("a", "z"), Edge("a", "x"), Edge("b", "y"), Edge("c", "y"), Edge("d", "y")])
 mygraph.label_greedy()
 print(mygraph.greedy_labels)
 
 mygraph.label_chang_kuo_mod()
 print(mygraph.chang_kuo_labels)
 
-c7 = Graph([Edge("a", "b"), Edge("b", "c"), Edge("c", "d"), Edge("d", "e"), Edge("e", "f"), Edge("f", "g"), Edge("g", "a")])
-c7.label_greedy()
-print(c7.greedy_labels)
-c7.label_chang_kuo_mod()
-print(c7.chang_kuo_labels)
+
 
 ```
 
@@ -170,8 +164,8 @@ print(c7.chang_kuo_labels)
 
 ```{python}
 # graph based on greedy labels
-x = createGraph(c7.adjacency_matrix, {k: v for (k, v) in zip(
-    range(len(c7.greedy_labels)), map(str, c7.greedy_labels))})
+x = createGraph(mygraph.adjacency_matrix, {k: v for (k, v) in zip(
+    range(len(mygraph.greedy_labels)), map(str, mygraph.greedy_labels))})
 
 ```
 
@@ -181,7 +175,7 @@ x = createGraph(c7.adjacency_matrix, {k: v for (k, v) in zip(
 
 ```{python}
 # graph based on Chang Kuo Labels
-createGraph(c7.adjacency_matrix, {k: v for (k, v) in zip(
-    range(len(c7.chang_kuo_labels)), map(str, c7.chang_kuo_labels))})
+createGraph(mygraph.adjacency_matrix, {k: v for (k, v) in zip(
+    range(len(mygraph.chang_kuo_labels)), map(str, mygraph.chang_kuo_labels))})
 
 ```
